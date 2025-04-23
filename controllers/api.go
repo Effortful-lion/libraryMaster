@@ -1,7 +1,6 @@
 package controllers
 
 import (
-	"encoding/json"
 	"librarysystem/models"
 	"net/http"
 	"strconv"
