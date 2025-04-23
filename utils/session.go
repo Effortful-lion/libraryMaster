@@ -1,4 +1,3 @@
-
 package utils
 
 import (
@@ -55,48 +54,49 @@ type SessionManager struct {
 func NewSessionManager(c *gin.Context) *SessionManager {
 	return &SessionManager{
 		store: &MemorySessionStore{
-			sessions: make(map[string]*sessionItem),
+			Sessions: make(map[string]*SessionItem),
 		},
 		ctx: c,
 	}
 }
 
-type sessionItem struct {
-	data   map[string]interface{}
-	expiry time.Time
-}
-
 // MemorySessionStore 内存会话存储实现
 type MemorySessionStore struct {
-	sessions map[string]*sessionItem
+	Sessions map[string]*SessionItem
+}
+
+// SessionItem struct
+type SessionItem struct {
+	Data   map[string]interface{}
+	Expiry time.Time
 }
 
 // 会话存储相关方法实现
 func (s *MemorySessionStore) Get(sessionID string) (map[string]interface{}, error) {
-	if item, exists := s.sessions[sessionID]; exists && time.Now().Before(item.expiry) {
-		return item.data, nil
+	if item, exists := s.Sessions[sessionID]; exists && time.Now().Before(item.Expiry) {
+		return item.Data, nil
 	}
 	return nil, fmt.Errorf("session not found or expired")
 }
 
 func (s *MemorySessionStore) Save(sessionID string, data map[string]interface{}, expiry time.Time) error {
-	s.sessions[sessionID] = &sessionItem{
-		data:   data,
-		expiry: expiry,
+	s.Sessions[sessionID] = &SessionItem{
+		Data:   data,
+		Expiry: expiry,
 	}
 	return nil
 }
 
 func (s *MemorySessionStore) Delete(sessionID string) error {
-	delete(s.sessions, sessionID)
+	delete(s.Sessions, sessionID)
 	return nil
 }
 
 func (s *MemorySessionStore) ClearExpired() error {
 	now := time.Now()
-	for id, session := range s.sessions {
-		if now.After(session.expiry) {
-			delete(s.sessions, id)
+	for id, session := range s.Sessions {
+		if now.After(session.Expiry) {
+			delete(s.Sessions, id)
 		}
 	}
 	return nil
@@ -262,13 +262,14 @@ func generateSessionID() string {
 	rand.Read(b)
 	return base64.StdEncoding.EncodeToString(b)
 }
+
 // CleanupExpiredSessions 清理过期的会话
 func CleanupExpiredSessions() {
 	// 获取默认存储实例
 	store := &MemorySessionStore{
-		sessions: make(map[string]*sessionItem),
+		Sessions: make(map[string]*SessionItem),
 	}
-	
+
 	// 调用清理方法
 	if err := store.ClearExpired(); err != nil {
 		log.Printf("清理过期会话时出错: %v\n", err)
