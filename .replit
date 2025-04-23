@@ -17,4 +17,8 @@ args = "go mod tidy"
 
 [[workflows.workflow.tasks]]
 task = "shell.exec"
-args = "go run ."
+args = "go build -o app"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "./app"

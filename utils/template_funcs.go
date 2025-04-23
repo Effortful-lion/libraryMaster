@@ -7,43 +7,45 @@ import (
 	"time"
 )
 
-// TemplateFunctions 返回可在模板中使用的自定义函数
 func TemplateFunctions() template.FuncMap {
 	return template.FuncMap{
-		// 格式化日期时间
-		"formatDate": formatDate,
-		"formatDateTime": formatDateTime,
+		"formatDate": func(t time.Time) string {
+			if t.IsZero() {
+				return ""
+			}
+			return t.Format("2006-01-02 15:04:05")
+		},
+		"formatDateTime": func(t time.Time) string {
+			return t.Format("2006-01-02 15:04:05")
+		},
 
-		// 日期计算
 		"daysBetween": daysBetween,
-		"daysAgo": daysAgo,
+		"daysAgo":     daysAgo,
 		"daysFromNow": daysFromNow,
 
-		// 字符串操作
 		"truncate": truncate,
 		"contains": strings.Contains,
-		"upper": strings.ToUpper,
-		"lower": strings.ToLower,
+		"upper":    strings.ToUpper,
+		"lower":    strings.ToLower,
 
-		// 数值操作
-		"add": add,
+		"add":      add,
 		"subtract": subtract,
 		"multiply": multiply,
-		"divide": divide,
+		"divide":   divide,
 
-		// 条件判断
-		"eq": eq,
-		"ne": ne,
-		"lt": lt,
+		"eq":  eq,
+		"ne":  ne,
+		"lt":  lt,
 		"lte": lte,
-		"gt": gt,
+		"gt":  gt,
 		"gte": gte,
 
-		// 切片和映射操作
 		"join": strings.Join,
 		"split": strings.Split,
 
-		// 时间判断
+		"isOverDue": func(t time.Time) bool {
+			return !t.IsZero() && time.Now().After(t)
+		},
 		"isOverdue": isOverdue,
 	}
 }
@@ -86,11 +88,11 @@ func truncate(s string, n int) string {
 func add(a, b int) int      { return a + b }
 func subtract(a, b int) int { return a - b }
 func multiply(a, b int) int { return a * b }
-func divide(a, b int) int   { 
+func divide(a, b int) int   {
 	if b == 0 {
 		return 0
 	}
-	return a / b 
+	return a / b
 }
 
 // 条件判断

@@ -34,7 +34,7 @@ func APIBookGet(c *gin.Context) {
 
 // APICategoriesGet 获取所有图书分类
 func APICategoriesGet(c *gin.Context) {
-	categories := models.GetCategories()
+	categories := models.GetAllCategories()
 	c.JSON(http.StatusOK, categories)
 }
 
