@@ -14,9 +14,9 @@ import (
 // AdminUsers 管理员用户管理页面
 func AdminUsers(db *gorm.DB) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		sessionManager := utils.NewSessionManager(c)
-		sessionData := sessionManager.GetSessionData()
-		
+		mg := utils.NewSessionManager(c)
+		session := mg.GetSession(c)
+
 		// 查询所有用户
 		var users []models.User
 		db.Order("id ASC").Find(&users)
@@ -26,11 +26,8 @@ func AdminUsers(db *gorm.DB) gin.HandlerFunc {
 			"title":       "用户管理",
 			"users":       users,
 			"currentYear": c.MustGet("currentYear"),
-		}
-		
-		// 合并会话数据
-		for k, v := range sessionData {
-			data[k] = v
+			"username":    mg.GetUsernameFromSession(c),
+			"user_role":   mg.GetUserRoleFromSession(c),
 		}
 		
 		c.HTML(http.StatusOK, "admin/users.html", data)
