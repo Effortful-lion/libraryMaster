@@ -15,7 +15,6 @@ import (
 func AdminUsers(db *gorm.DB) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		mg := utils.NewSessionManager(c)
-		session := mg.GetSession(c)
 
 		// 查询所有用户
 		var users []models.User
