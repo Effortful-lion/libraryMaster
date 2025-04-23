@@ -6,25 +6,25 @@
     <div class="py-5 text-center">
         <h1 class="display-4"><i class="fas fa-book"></i> 欢迎使用图书馆管理系统</h1>
         <p class="lead">一个高效、简单的图书馆管理解决方案，支持图书借阅、归还、查询和管理。</p>
-        
+
         {% if not current_user.is_authenticated %}
-            <div class="mt-4">
-                <a href="{{ url_for('login') }}" class="btn btn-primary btn-lg mx-2">
-                    <i class="fas fa-sign-in-alt"></i> 登录
-                </a>
-                <a href="{{ url_for('register') }}" class="btn btn-outline-secondary btn-lg mx-2">
-                    <i class="fas fa-user-plus"></i> 注册
-                </a>
-            </div>
+        <div class="mt-4">
+            <a href="{{ url_for " login" }}" class="btn btn-primary btn-lg mx-2">
+                <i class="fas fa-sign-in-alt"></i> 登录
+            </a>
+            <a href="{{ url_for " register" }}" class="btn btn-outline-secondary btn-lg mx-2">
+                <i class="fas fa-user-plus"></i> 注册
+            </a>
+        </div>
         {% else %}
-            <div class="mt-4">
-                <a href="{{ url_for('dashboard') }}" class="btn btn-primary btn-lg">
-                    <i class="fas fa-tachometer-alt"></i> 进入仪表板
-                </a>
-            </div>
+        <div class="mt-4">
+            <a href="{{ url_for " dashboard" }}" class="btn btn-primary btn-lg">
+                <i class="fas fa-tachometer-alt"></i> 进入仪表板
+            </a>
+        </div>
         {% endif %}
     </div>
-    
+
     <!-- 功能介绍 -->
     <div class="row mb-5">
         <div class="col-md-4 mb-4">
@@ -47,7 +47,8 @@
                     <p class="card-text">方便的图书借阅、归还流程，可以查看借阅历史和当前状态。</p>
                 </div>
                 <div class="card-footer">
-                    <a href="{% if current_user.is_authenticated %}{{ url_for('reader_borrowed') }}{% else %}{{ url_for('login') }}{% endif %}" class="btn btn-outline-success w-100">管理我的借阅</a>
+                    <a href="{% if current_user.is_authenticated %}{{ url_for " reader_borrowed" }}{% else %}{{
+                        url_for "login" }}{% endif %}" class="btn btn-outline-success w-100">管理我的借阅</a>
                 </div>
             </div>
         </div>
@@ -59,45 +60,42 @@
                     <p class="card-text">系统提供三种角色：管理员、图书管理员和读者，各司其职。</p>
                 </div>
                 <div class="card-footer">
-                    <a href="{{ url_for('register') }}" class="btn btn-outline-warning w-100">注册账号</a>
+                    <a href="{{ url_for " register" }}" class="btn btn-outline-warning w-100">注册账号</a>
                 </div>
             </div>
         </div>
     </div>
-    
+
     <!-- 精选图书 -->
     <div class="mb-5">
         <h2 class="mb-4"><i class="fas fa-star"></i> 精选图书</h2>
         <div class="row">
-            {% for book in featured_books %}
-                <div class="col-md-3 mb-4">
-                    <div class="card h-100 card-hover">
-                        <img src="{{ book.cover_url }}" alt="{{ book.title }}" class="card-img-top book-cover">
-                        <div class="card-body">
-                            <h5 class="card-title">{{ book.title }}</h5>
-                            <p class="card-text mb-1">作者：{{ book.author }}</p>
-                            <p class="card-text mb-1">
-                                <span class="category-badge">{{ book.category }}</span>
-                            </p>
-                            <div class="mt-2">
-                                <span class="text-muted small">ISBN: {{ book.isbn }}</span>
-                            </div>
-                        </div>
+            {{ range .featured_books }}
+            <div class="col-md-3 mb-4">
+                <div class="card h-100 card-hover">
+                    <img src="{{ .cover_url }}" alt="{{ .title }}" class="card-img-top book-cover">
+                    <div class="card-body">
+                        <h5 class="card-title">{{ .title }}</h5>
+                        <p class="card-text mb-1">作者：{{ .author }}</p>
                         <div class="card-footer">
-                            <a href="{{ url_for('book_detail', book_id=book.id) }}" class="btn btn-sm btn-outline-primary w-100">查看详情</a>
+                            <a href="{{ url_for " book_detail" "id" .id }}"
+                                class="btn btn-sm btn-outline-primary w-100">
+                                查看详情
+                            </a>
                         </div>
                     </div>
                 </div>
-            {% endfor %}
+            </div>
+            {{ end }}
         </div>
-        
+
         <div class="text-center mt-4">
-            <a href="{{ url_for('books') }}" class="btn btn-primary">
+            <a href="{{ url_for "books" }}" class="btn btn-primary">
                 <i class="fas fa-book-open"></i> 查看所有图书
             </a>
         </div>
     </div>
-    
+
     <!-- 系统特点 -->
     <div class="mb-5">
         <h2 class="mb-4"><i class="fas fa-check-circle"></i> 系统特点</h2>

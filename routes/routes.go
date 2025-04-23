@@ -3,21 +3,78 @@ package routes
 import (
 	"librarysystem/controllers"
 	"librarysystem/middleware"
-	"librarysystem/utils"
+	"reflect"
+	"strings"
+	"text/template"
+	"time"
+
 	"github.com/gin-gonic/gin"
 )
 
 // SetupRouter 配置路由
 func SetupRouter() *gin.Engine {
-	// 创建路由
 	r := gin.Default()
+    
+    // 添加静态文件路由
+    r.Static("/static", "./static")
+    
+    r.SetFuncMap(template.FuncMap{
+		"isNil": func(i interface{}) bool {
+			return i == nil || reflect.ValueOf(i).IsNil()
+		},
+		"isOverDue": func(t time.Time) bool {
+			return time.Now().After(t)
+		},
+		"formatDate": func(t time.Time) string {
+			return t.Format("2006-01-02") // Go 的日期格式化模板
+		},
+		"daysSince": func(t time.Time) int {
+			return int(time.Since(t).Hours() / 24)
+		},
+		"daysUntil": func(t time.Time) int {
+			return int(time.Until(t).Hours() / 24)
+		},
+		"sub": func(a, b int) int {
+			return a - b
+		},
+		"seq": func(n int) []int {
+			s := make([]int, n)
+			for i := range s {
+				s[i] = i + 1
+			}
+			return s
+		},
+		"add": func(a, b int) int {
+			return a + b
+		},
+		"formatDateTime": func(t time.Time) string {
+			return t.Format("2006-01-02 15:04") // 包含日期和时间
+		},
+		"url_for": func(routeName string, pairs ...string) string {
+			routes := map[string]string{
+				"static": "/static/%s",  // 新增静态文件路由
+				"book_detail": "/books/%s",  // 修改为格式化字符串
+				"index":           "/",
+				"books":           "/books",
+				"reader_books":    "/reader/books",
+				"reader_borrowed": "/reader/borrowed",
+				// 添加更多路由映射...
+			}
+			
+			if len(pairs)%2 != 0 {
+				return ""
+			}
+			
+			path := routes[routeName]
+			for i := 0; i < len(pairs); i += 2 {
+				path = strings.Replace(path, ":"+pairs[i], pairs[i+1], 1)
+			}
+			return path
+		},
+	})
 
-	// 设置模板目录和静态文件目录
-	r.LoadHTMLGlob("templates/**/*")
-	r.Static("/static", "./static")
-
-	 // 加载自定义函数到模板
-	r.SetFuncMap(utils.TemplateFunctions())
+	r.LoadHTMLGlob("templates/*.html")
+	r.LoadHTMLGlob("templates/**/*.html")
 
 	// 公共路由
 	r.GET("/", controllers.IndexGet)

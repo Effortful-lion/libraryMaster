@@ -1,21 +1,26 @@
 <!DOCTYPE html>
 <html lang="zh">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}图书馆管理系统{% endblock %}</title>
-    
+
     <!-- Bootstrap CSS -->
     <link href="https://cdn.replit.com/agent/bootstrap-agent-dark-theme.min.css" rel="stylesheet">
-    
+
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
-    
+
     <!-- 自定义CSS -->
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/custom.css') }}">
-    
+    <link rel="stylesheet" href="{{ url_for "static", filename='css/custom.css' }}">
+
+    <!-- 主要 JavaScript -->
+    <script src="{{ url_for "static", filename='js/main.js' }}"></script>
+
     {% block extra_styles %}{% endblock %}
 </head>
+
 <body>
     <!-- 导航栏 -->
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
@@ -23,7 +28,8 @@
             <a class="navbar-brand" href="{{ url_for('index') }}">
                 <i class="fas fa-book"></i> 图书馆管理系统
             </a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
@@ -34,91 +40,102 @@
                     <li class="nav-item">
                         <a class="nav-link" href="{{ url_for('books') }}"><i class="fas fa-book-open"></i> 图书列表</a>
                     </li>
-                    
+
                     {% if current_user.is_authenticated %}
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{ url_for('dashboard') }}"><i class="fas fa-tachometer-alt"></i> 仪表板</a>
-                        </li>
-                        
-                        {% if current_user.role == 'admin' %}
-                            <li class="nav-item dropdown">
-                                <a class="nav-link dropdown-toggle" href="#" id="adminDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                    <i class="fas fa-user-shield"></i> 管理员
-                                </a>
-                                <ul class="dropdown-menu" aria-labelledby="adminDropdown">
-                                    <li><a class="dropdown-item" href="{{ url_for('admin_books') }}"><i class="fas fa-book"></i> 图书管理</a></li>
-                                    <li><a class="dropdown-item" href="{{ url_for('admin_users') }}"><i class="fas fa-users"></i> 用户管理</a></li>
-                                </ul>
-                            </li>
-                        {% endif %}
-                        
-                        {% if current_user.role in ['librarian', 'admin'] %}
-                            <li class="nav-item dropdown">
-                                <a class="nav-link dropdown-toggle" href="#" id="librarianDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                    <i class="fas fa-user-tie"></i> 图书管理员
-                                </a>
-                                <ul class="dropdown-menu" aria-labelledby="librarianDropdown">
-                                    <li><a class="dropdown-item" href="{{ url_for('librarian_books') }}"><i class="fas fa-box"></i> 库存管理</a></li>
-                                    <li><a class="dropdown-item" href="{{ url_for('librarian_borrow') }}"><i class="fas fa-exchange-alt"></i> 借阅管理</a></li>
-                                </ul>
-                            </li>
-                        {% endif %}
-                        
-                        <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" href="#" id="readerDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                <i class="fas fa-user"></i> 读者
-                            </a>
-                            <ul class="dropdown-menu" aria-labelledby="readerDropdown">
-                                <li><a class="dropdown-item" href="{{ url_for('reader_books') }}"><i class="fas fa-search"></i> 查找图书</a></li>
-                                <li><a class="dropdown-item" href="{{ url_for('reader_borrowed') }}"><i class="fas fa-list"></i> 我的借阅</a></li>
-                            </ul>
-                        </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for " dashboard" }}"><i class="fas fa-tachometer-alt"></i>
+                            仪表板</a>
+                    </li>
+
+                    {% if current_user.role == 'admin' %}
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="adminDropdown" role="button"
+                            data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="fas fa-user-shield"></i> 管理员
+                        </a>
+                        <ul class="dropdown-menu" aria-labelledby="adminDropdown">
+                            <li><a class="dropdown-item" href="{{ url_for " admin_books" }}"><i class="fas fa-book"></i>
+                                    图书管理</a></li>
+                            <li><a class="dropdown-item" href="{{ url_for('admin_users') }}"><i
+                                        class="fas fa-users"></i>
+                                    用户管理</a></li>
+                        </ul>
+                    </li>
+                    {% endif %}
+
+                    {% if current_user.role in ['librarian', 'admin'] %}
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="librarianDropdown" role="button"
+                            data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="fas fa-user-tie"></i> 图书管理员
+                        </a>
+                        <ul class="dropdown-menu" aria-labelledby="librarianDropdown">
+                            <li><a class="dropdown-item" href="{{ url_for " librarian_books" }}"><i
+                                        class="fas fa-box"></i> 库存管理</a></li>
+                            <li><a class="dropdown-item" href="{{ url_for" librarian_borrow" }}"><i
+                                        class="fas fa-exchange-alt"></i> 借阅管理</a></li>
+                        </ul>
+                    </li>
+                    {% endif %}
+
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="readerDropdown" role="button"
+                            data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="fas fa-user"></i> 读者
+                        </a>
+                        <ul class="dropdown-menu" aria-labelledby="readerDropdown">
+                            <li><a class="dropdown-item" href="{{ url_for" reader_books" }}"><i
+                                        class="fas fa-search"></i> 查找图书</a></li>
+                            <li><a class="dropdown-item" href="{{ url_for" reader_borrowed" }}"><i
+                                        class="fas fa-list"></i> 我的借阅</a></li>
+                        </ul>
+                    </li>
                     {% endif %}
                 </ul>
-                
+
                 <div class="navbar-nav">
                     {% if current_user.is_authenticated %}
-                        <span class="nav-item nav-link text-white">
-                            <i class="fas fa-user-circle"></i> {{ current_user.username }}
-                            
-                            {% if current_user.role == 'admin' %}
-                                <span class="badge bg-danger">管理员</span>
-                            {% elif current_user.role == 'librarian' %}
-                                <span class="badge bg-success">图书管理员</span>
-                            {% else %}
-                                <span class="badge bg-primary">读者</span>
-                            {% endif %}
-                        </span>
-                        
-                        <a class="nav-link" href="{{ url_for('logout') }}"><i class="fas fa-sign-out-alt"></i> 退出</a>
+                    <span class="nav-item nav-link text-white">
+                        <i class="fas fa-user-circle"></i> {{ current_user.username }}
+
+                        {% if current_user.role == 'admin' %}
+                        <span class="badge bg-danger">管理员</span>
+                        {% elif current_user.role == 'librarian' %}
+                        <span class="badge bg-success">图书管理员</span>
+                        {% else %}
+                        <span class="badge bg-primary">读者</span>
+                        {% endif %}
+                    </span>
+
+                    <a class="nav-link" href="{{ url_for" logout" }}"><i class="fas fa-sign-out-alt"></i> 退出</a>
                     {% else %}
-                        <a class="nav-link" href="{{ url_for('login') }}"><i class="fas fa-sign-in-alt"></i> 登录</a>
-                        <a class="nav-link" href="{{ url_for('register') }}"><i class="fas fa-user-plus"></i> 注册</a>
+                    <a class="nav-link" href="{{ url_for" login" }}"><i class="fas fa-sign-in-alt"></i> 登录</a>
+                    <a class="nav-link" href="{{ url_for" register" }}"><i class="fas fa-user-plus"></i> 注册</a>
                     {% endif %}
                 </div>
             </div>
         </div>
     </nav>
-    
+
     <!-- 闪存消息 -->
     {% with messages = get_flashed_messages(with_categories=true) %}
-        {% if messages %}
-            <div class="container mt-3">
-                {% for category, message in messages %}
-                    <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
-                        {{ message }}
-                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                    </div>
-                {% endfor %}
-            </div>
-        {% endif %}
+    {% if messages %}
+    <div class="container mt-3">
+        {% for category, message in messages %}
+        <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
     {% endwith %}
-    
+
     <!-- 主内容 -->
     <main class="py-4">
         {% block content %}{% endblock %}
     </main>
-    
+
     <!-- 页脚 -->
     <footer class="bg-dark text-white mt-5 py-3">
         <div class="container">
@@ -130,9 +147,12 @@
                 <div class="col-md-3">
                     <h5>快速链接</h5>
                     <ul class="list-unstyled">
-                        <li><a href="{{ url_for('index') }}" class="text-decoration-none text-white"><i class="fas fa-home"></i> 首页</a></li>
-                        <li><a href="{{ url_for('books') }}" class="text-decoration-none text-white"><i class="fas fa-book-open"></i> 图书列表</a></li>
-                        <li><a href="{{ url_for('dashboard') }}" class="text-decoration-none text-white"><i class="fas fa-tachometer-alt"></i> 仪表板</a></li>
+                        <li><a href="{{ url_for('index') }}" class="text-decoration-none text-white"><i
+                                    class="fas fa-home"></i> 首页</a></li>
+                        <li><a href="{{ url_for('books') }}" class="text-decoration-none text-white"><i
+                                    class="fas fa-book-open"></i> 图书列表</a></li>
+                        <li><a href="{{ url_for " dashboard" }}" class="text-decoration-none text-white"><i
+                                    class="fas fa-tachometer-alt"></i> 仪表板</a></li>
                     </ul>
                 </div>
                 <div class="col-md-3">
@@ -149,26 +169,27 @@
             </div>
         </div>
     </footer>
-    
+
     <!-- Bootstrap Bundle with Popper -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
-    
+
     <!-- 主要 JavaScript -->
     <script src="{{ url_for('static', filename='js/main.js') }}"></script>
-    
+
     <!-- 角色特定 JavaScript -->
     {% if current_user.is_authenticated %}
-        {% if current_user.role == 'admin' %}
-            <script src="{{ url_for('static', filename='js/admin.js') }}"></script>
-        {% endif %}
-        
-        {% if current_user.role in ['librarian', 'admin'] %}
-            <script src="{{ url_for('static', filename='js/librarian.js') }}"></script>
-        {% endif %}
-        
-        <script src="{{ url_for('static', filename='js/reader.js') }}"></script>
+    {% if current_user.role == 'admin' %}
+    <script src="{{ url_for('static', filename='js/admin.js') }}"></script>
     {% endif %}
-    
+
+    {% if current_user.role in ['librarian', 'admin'] %}
+    <script src="{{ url_for('static', filename='js/librarian.js') }}"></script>
+    {% endif %}
+
+    <script src="{{ url_for('static', filename='js/reader.js') }}"></script>
+    {% endif %}
+
     {% block extra_scripts %}{% endblock %}
 </body>
+
 </html>

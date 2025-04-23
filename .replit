@@ -1,4 +1,4 @@
-modules = ["web", "go-1.21", "nodejs-20"]
+modules = ["web", "go-1.23", "nodejs-20"]
 
 [nix]
 channel = "stable-24_05"

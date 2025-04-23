@@ -9,6 +9,7 @@ import (
         "time"
 
         "github.com/gin-gonic/gin"
+        "github.com/joho/godotenv"
         "librarysystem/config"
         "librarysystem/database"
         "librarysystem/routes"
@@ -16,6 +17,11 @@ import (
 )
 
 func main() {
+	// 在main函数最开始添加（必须在其他初始化操作之前）
+	if err := godotenv.Load(); err != nil {
+		log.Fatal("加载.env文件失败: ", err)
+	}
+	
         // 设置日志格式
         log.SetFlags(log.LstdFlags | log.Lshortfile)
         log.Println("启动图书管理系统...")
