@@ -13,24 +13,24 @@ func TemplateFunctions() template.FuncMap {
 		// 格式化日期时间
 		"formatDate": formatDate,
 		"formatDateTime": formatDateTime,
-		
+
 		// 日期计算
 		"daysBetween": daysBetween,
 		"daysAgo": daysAgo,
 		"daysFromNow": daysFromNow,
-		
+
 		// 字符串操作
 		"truncate": truncate,
 		"contains": strings.Contains,
 		"upper": strings.ToUpper,
 		"lower": strings.ToLower,
-		
+
 		// 数值操作
 		"add": add,
 		"subtract": subtract,
 		"multiply": multiply,
 		"divide": divide,
-		
+
 		// 条件判断
 		"eq": eq,
 		"ne": ne,
@@ -38,11 +38,11 @@ func TemplateFunctions() template.FuncMap {
 		"lte": lte,
 		"gt": gt,
 		"gte": gte,
-		
+
 		// 切片和映射操作
 		"join": strings.Join,
 		"split": strings.Split,
-		
+
 		// 时间判断
 		"isOverdue": isOverdue,
 	}
@@ -75,59 +75,33 @@ func daysFromNow(t time.Time) int {
 }
 
 // 截断字符串
-func truncate(s string, maxLength int) string {
-	if len(s) <= maxLength {
+func truncate(s string, n int) string {
+	if len(s) <= n {
 		return s
 	}
-	return s[:maxLength] + "..."
+	return s[:n] + "..."
 }
 
 // 数值操作
-func add(a, b int) int {
-	return a + b
-}
-
-func subtract(a, b int) int {
-	return a - b
-}
-
-func multiply(a, b int) int {
-	return a * b
-}
-
-func divide(a, b int) int {
+func add(a, b int) int      { return a + b }
+func subtract(a, b int) int { return a - b }
+func multiply(a, b int) int { return a * b }
+func divide(a, b int) int   { 
 	if b == 0 {
 		return 0
 	}
-	return a / b
+	return a / b 
 }
 
 // 条件判断
-func eq(a, b interface{}) bool {
-	return fmt.Sprintf("%v", a) == fmt.Sprintf("%v", b)
-}
+func eq(a, b interface{}) bool { return a == b }
+func ne(a, b interface{}) bool { return a != b }
+func lt(a, b int) bool        { return a < b }
+func lte(a, b int) bool       { return a <= b }
+func gt(a, b int) bool        { return a > b }
+func gte(a, b int) bool       { return a >= b }
 
-func ne(a, b interface{}) bool {
-	return !eq(a, b)
-}
-
-func lt(a, b int) bool {
-	return a < b
-}
-
-func lte(a, b int) bool {
-	return a <= b
-}
-
-func gt(a, b int) bool {
-	return a > b
-}
-
-func gte(a, b int) bool {
-	return a >= b
-}
-
-// 判断日期是否已过期（相对于当前时间）
+// 判断是否逾期
 func isOverdue(t time.Time) bool {
 	return time.Now().After(t)
 }
