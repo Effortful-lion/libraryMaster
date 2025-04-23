@@ -1,0 +1,201 @@
+{{ define "content" }}
+<div class="container">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1><i class="fas fa-book-open"></i> 图书列表</h1>
+        
+        <!-- 搜索框 -->
+        <div class="d-flex">
+            <form action="/books" method="GET" class="d-flex">
+                <input type="text" name="q" class="form-control search-box me-2" placeholder="搜索图书..." value="{{ .query }}">
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-search"></i>
+                </button>
+            </form>
+        </div>
+    </div>
+    
+    <!-- 分类筛选 -->
+    <div class="mb-4">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-filter"></i> 筛选选项</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <label for="category-filter" class="form-label">分类：</label>
+                        <select id="category-filter" class="form-select">
+                            <option value="all">所有分类</option>
+                            {{ range .categories }}
+                                <option value="{{ . }}" {{ if eq . $.selected_category }}selected{{ end }}>{{ . }}</option>
+                            {{ end }}
+                        </select>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="book-sort" class="form-label">排序方式：</label>
+                        <select id="book-sort" class="form-select">
+                            <option value="title-asc">标题 (A-Z)</option>
+                            <option value="title-desc">标题 (Z-A)</option>
+                            <option value="year-desc">出版年份 (新-旧)</option>
+                            <option value="year-asc">出版年份 (旧-新)</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 图书列表 -->
+    <div class="row book-list" id="book-list">
+        {{ if .books }}
+            {{ range .books }}
+                <div class="col-md-3 mb-4 book-item" data-category="{{ .category }}">
+                    <div class="card h-100 card-hover">
+                        <img src="{{ .cover_url }}" class="card-img-top book-cover" alt="{{ .title }}">
+                        <div class="card-body">
+                            <h5 class="card-title book-title">{{ .title }}</h5>
+                            <p class="card-text book-author mb-1">作者：{{ .author }}</p>
+                            <p class="card-text mb-1">
+                                <span class="category-badge">{{ .category }}</span>
+                            </p>
+                            <p class="card-text mb-1">
+                                <small class="text-muted">出版年份: {{ .published_year }}</small>
+                            </p>
+                            <p class="card-text book-isbn d-none">{{ .isbn }}</p>
+                            
+                            <div class="mt-2">
+                                <span class="me-2">
+                                    <span class="availability-indicator 
+                                        {{ if gt .quantity 5 }}available
+                                        {{ else if gt .quantity 0 }}low-stock
+                                        {{ else }}unavailable{{ end }}">
+                                    </span>
+                                    {{ if gt .quantity 5 }}
+                                        <span class="text-success">有库存</span>
+                                    {{ else if gt .quantity 0 }}
+                                        <span class="text-warning">库存不足</span>
+                                    {{ else }}
+                                        <span class="text-danger">无库存</span>
+                                    {{ end }}
+                                </span>
+                                <small class="text-muted">剩余: {{ .quantity }}</small>
+                            </div>
+                        </div>
+                        <div class="card-footer d-flex justify-content-between">
+                            <a href="/books/{{ .id }}" class="btn btn-sm btn-outline-primary flex-grow-1 me-1">
+                                <i class="fas fa-info-circle"></i> 详情
+                            </a>
+                            {{ if $.is_authenticated }}
+                                <a href="/reader/borrow/{{ .id }}" class="btn btn-sm btn-outline-success flex-grow-1 ms-1 {{ if le .quantity 0 }}disabled{{ end }}">
+                                    <i class="fas fa-hand-holding"></i> 借阅
+                                </a>
+                            {{ else }}
+                                <a href="/login" class="btn btn-sm btn-outline-success flex-grow-1 ms-1">
+                                    <i class="fas fa-sign-in-alt"></i> 登录借阅
+                                </a>
+                            {{ end }}
+                        </div>
+                    </div>
+                </div>
+            {{ end }}
+        {{ else }}
+            <div class="col-12 text-center py-5">
+                <i class="fas fa-search fa-3x mb-3 text-muted"></i>
+                <h4>没有找到符合条件的图书</h4>
+                <p class="text-muted">请尝试其他搜索关键词或浏览所有图书。</p>
+                <a href="/books" class="btn btn-primary mt-3">查看所有图书</a>
+            </div>
+        {{ end }}
+    </div>
+    
+    <!-- 分页 -->
+    {{ if gt .total_pages 1 }}
+        <nav aria-label="图书列表分页" class="my-4">
+            <ul class="pagination justify-content-center">
+                <li class="page-item {{ if le .current_page 1 }}disabled{{ end }}">
+                    <a class="page-link" href="/books?page={{ sub .current_page 1 }}{{ if .query }}&q={{ .query }}{{ end }}{{ if .selected_category }}&category={{ .selected_category }}{{ end }}" aria-label="上一页">
+                        <i class="fas fa-chevron-left"></i>
+                    </a>
+                </li>
+                
+                {{ range $i := seq 1 .total_pages }}
+                    <li class="page-item {{ if eq $i $.current_page }}active{{ end }}">
+                        <a class="page-link" href="/books?page={{ $i }}{{ if $.query }}&q={{ $.query }}{{ end }}{{ if $.selected_category }}&category={{ $.selected_category }}{{ end }}">{{ $i }}</a>
+                    </li>
+                {{ end }}
+                
+                <li class="page-item {{ if ge .current_page .total_pages }}disabled{{ end }}">
+                    <a class="page-link" href="/books?page={{ add .current_page 1 }}{{ if .query }}&q={{ .query }}{{ end }}{{ if .selected_category }}&category={{ .selected_category }}{{ end }}" aria-label="下一页">
+                        <i class="fas fa-chevron-right"></i>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+    {{ end }}
+</div>
+{{ end }}
+
+{{ define "extra_scripts" }}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // 分类筛选功能
+        const categoryFilter = document.getElementById('category-filter');
+        if (categoryFilter) {
+            categoryFilter.addEventListener('change', function() {
+                const category = this.value;
+                const currentUrl = new URL(window.location.href);
+                
+                if (category === 'all') {
+                    currentUrl.searchParams.delete('category');
+                } else {
+                    currentUrl.searchParams.set('category', category);
+                }
+                
+                // 重置页码
+                currentUrl.searchParams.set('page', '1');
+                
+                window.location.href = currentUrl.toString();
+            });
+        }
+        
+        // 图书排序功能
+        const bookSort = document.getElementById('book-sort');
+        if (bookSort) {
+            bookSort.addEventListener('change', function() {
+                const sortValue = this.value;
+                const bookList = document.getElementById('book-list');
+                
+                if (!bookList) return;
+                
+                const bookItems = Array.from(bookList.querySelectorAll('.book-item'));
+                
+                // 排序图书
+                bookItems.sort(function(a, b) {
+                    const titleA = a.querySelector('.book-title').textContent;
+                    const titleB = b.querySelector('.book-title').textContent;
+                    const yearA = parseInt(a.querySelector('small.text-muted').textContent.match(/\d+/)[0]);
+                    const yearB = parseInt(b.querySelector('small.text-muted').textContent.match(/\d+/)[0]);
+                    
+                    switch (sortValue) {
+                        case 'title-asc':
+                            return titleA.localeCompare(titleB);
+                        case 'title-desc':
+                            return titleB.localeCompare(titleA);
+                        case 'year-desc':
+                            return yearB - yearA;
+                        case 'year-asc':
+                            return yearA - yearB;
+                        default:
+                            return 0;
+                    }
+                });
+                
+                // 重新添加到DOM
+                bookItems.forEach(function(item) {
+                    bookList.appendChild(item);
+                });
+            });
+        }
+    });
+</script>
+{{ end }}

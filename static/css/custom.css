@@ -1,0 +1,121 @@
+/* 图书管理系统自定义CSS */
+
+/* 图书封面样式 */
+.book-cover {
+    height: 200px;
+    object-fit: cover;
+    border-radius: 4px;
+}
+
+/* 借阅记录表格样式 */
+.overdue {
+    color: #dc3545; /* 红色 */
+    font-weight: bold;
+}
+
+.returned {
+    color: #198754; /* 绿色 */
+}
+
+.active-borrow {
+    color: #0d6efd; /* 蓝色 */
+}
+
+/* 侧边栏活跃项目 */
+.list-group-item.active {
+    background-color: #343a40; /* 深色 */
+    border-color: #343a40;
+}
+
+/* 分类标签样式 */
+.category-badge {
+    background-color: #343a40;
+    color: #fff;
+    font-size: 0.85rem;
+    padding: 4px 8px;
+    border-radius: 4px;
+    margin-right: 5px;
+    margin-bottom: 5px;
+    display: inline-block;
+}
+
+/* 卡片悬停效果 */
+.card-hover:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+}
+
+/* 表格悬停效果 */
+.table-hover tbody tr:hover {
+    background-color: rgba(33, 37, 41, 0.05);
+}
+
+/* 搜索框样式 */
+.search-box {
+    border-radius: 30px;
+    padding-left: 20px;
+}
+
+/* 按钮动画 */
+.btn-animate:hover {
+    animation: pulse 1s;
+}
+
+@keyframes pulse {
+    0% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.05);
+    }
+    100% {
+        transform: scale(1);
+    }
+}
+
+/* 可用量指示器 */
+.availability-indicator {
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    margin-right: 5px;
+}
+
+.available {
+    background-color: #198754; /* 绿色 */
+}
+
+.low-stock {
+    background-color: #ffc107; /* 黄色 */
+}
+
+.unavailable {
+    background-color: #dc3545; /* 红色 */
+}
+
+/* 页面过渡动画 */
+.fade-in {
+    animation: fadeIn 0.5s;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+/* 移动端适配 */
+@media (max-width: 768px) {
+    .book-cover {
+        height: 150px;
+    }
+    
+    .hide-on-mobile {
+        display: none;
+    }
+}

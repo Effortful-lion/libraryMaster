@@ -1,0 +1,152 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+<div class="container">
+    <!-- 欢迎横幅 -->
+    <div class="py-5 text-center">
+        <h1 class="display-4"><i class="fas fa-book"></i> 欢迎使用图书馆管理系统</h1>
+        <p class="lead">一个高效、简单的图书馆管理解决方案，支持图书借阅、归还、查询和管理。</p>
+        
+        {% if not current_user.is_authenticated %}
+            <div class="mt-4">
+                <a href="{{ url_for('login') }}" class="btn btn-primary btn-lg mx-2">
+                    <i class="fas fa-sign-in-alt"></i> 登录
+                </a>
+                <a href="{{ url_for('register') }}" class="btn btn-outline-secondary btn-lg mx-2">
+                    <i class="fas fa-user-plus"></i> 注册
+                </a>
+            </div>
+        {% else %}
+            <div class="mt-4">
+                <a href="{{ url_for('dashboard') }}" class="btn btn-primary btn-lg">
+                    <i class="fas fa-tachometer-alt"></i> 进入仪表板
+                </a>
+            </div>
+        {% endif %}
+    </div>
+    
+    <!-- 功能介绍 -->
+    <div class="row mb-5">
+        <div class="col-md-4 mb-4">
+            <div class="card h-100 card-hover">
+                <div class="card-body text-center">
+                    <i class="fas fa-search fa-3x mb-3 text-primary"></i>
+                    <h4 class="card-title">查找图书</h4>
+                    <p class="card-text">轻松查找馆内各类图书，按书名、作者、分类进行筛选。</p>
+                </div>
+                <div class="card-footer">
+                    <a href="/books" class="btn btn-outline-primary w-100">浏览图书库</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card h-100 card-hover">
+                <div class="card-body text-center">
+                    <i class="fas fa-exchange-alt fa-3x mb-3 text-success"></i>
+                    <h4 class="card-title">借阅管理</h4>
+                    <p class="card-text">方便的图书借阅、归还流程，可以查看借阅历史和当前状态。</p>
+                </div>
+                <div class="card-footer">
+                    <a href="{% if current_user.is_authenticated %}{{ url_for('reader_borrowed') }}{% else %}{{ url_for('login') }}{% endif %}" class="btn btn-outline-success w-100">管理我的借阅</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card h-100 card-hover">
+                <div class="card-body text-center">
+                    <i class="fas fa-users-cog fa-3x mb-3 text-warning"></i>
+                    <h4 class="card-title">角色权限</h4>
+                    <p class="card-text">系统提供三种角色：管理员、图书管理员和读者，各司其职。</p>
+                </div>
+                <div class="card-footer">
+                    <a href="{{ url_for('register') }}" class="btn btn-outline-warning w-100">注册账号</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 精选图书 -->
+    <div class="mb-5">
+        <h2 class="mb-4"><i class="fas fa-star"></i> 精选图书</h2>
+        <div class="row">
+            {% for book in featured_books %}
+                <div class="col-md-3 mb-4">
+                    <div class="card h-100 card-hover">
+                        <img src="{{ book.cover_url }}" alt="{{ book.title }}" class="card-img-top book-cover">
+                        <div class="card-body">
+                            <h5 class="card-title">{{ book.title }}</h5>
+                            <p class="card-text mb-1">作者：{{ book.author }}</p>
+                            <p class="card-text mb-1">
+                                <span class="category-badge">{{ book.category }}</span>
+                            </p>
+                            <div class="mt-2">
+                                <span class="text-muted small">ISBN: {{ book.isbn }}</span>
+                            </div>
+                        </div>
+                        <div class="card-footer">
+                            <a href="{{ url_for('book_detail', book_id=book.id) }}" class="btn btn-sm btn-outline-primary w-100">查看详情</a>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+        
+        <div class="text-center mt-4">
+            <a href="{{ url_for('books') }}" class="btn btn-primary">
+                <i class="fas fa-book-open"></i> 查看所有图书
+            </a>
+        </div>
+    </div>
+    
+    <!-- 系统特点 -->
+    <div class="mb-5">
+        <h2 class="mb-4"><i class="fas fa-check-circle"></i> 系统特点</h2>
+        <div class="row">
+            <div class="col-md-6 mb-4">
+                <div class="d-flex">
+                    <div class="flex-shrink-0">
+                        <i class="fas fa-database fa-2x text-primary me-3"></i>
+                    </div>
+                    <div>
+                        <h5>数据管理</h5>
+                        <p>高效的数据管理系统，确保图书信息准确无误，并提供强大的搜索和过滤功能。</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 mb-4">
+                <div class="d-flex">
+                    <div class="flex-shrink-0">
+                        <i class="fas fa-shield-alt fa-2x text-primary me-3"></i>
+                    </div>
+                    <div>
+                        <h5>安全保障</h5>
+                        <p>完善的用户认证和授权系统，确保数据安全，并支持不同级别的访问控制。</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 mb-4">
+                <div class="d-flex">
+                    <div class="flex-shrink-0">
+                        <i class="fas fa-chart-bar fa-2x text-primary me-3"></i>
+                    </div>
+                    <div>
+                        <h5>统计分析</h5>
+                        <p>提供借阅统计和分析功能，帮助管理员了解图书流通情况和读者借阅偏好。</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 mb-4">
+                <div class="d-flex">
+                    <div class="flex-shrink-0">
+                        <i class="fas fa-mobile-alt fa-2x text-primary me-3"></i>
+                    </div>
+                    <div>
+                        <h5>响应式设计</h5>
+                        <p>完全响应式的界面设计，确保在各种设备上都能获得良好的使用体验。</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

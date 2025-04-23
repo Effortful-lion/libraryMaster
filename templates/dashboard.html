@@ -1,0 +1,250 @@
+{{ define "content" }}
+<div class="container">
+    <h1 class="mb-4">仪表板</h1>
+    
+    <div class="row">
+        <div class="col-md-3">
+            <!-- 侧边栏 -->
+            <div class="card mb-4">
+                <div class="card-header bg-dark text-white">
+                    <h5 class="mb-0"><i class="fas fa-user-circle"></i> {{ .username }}</h5>
+                </div>
+                <div class="card-body">
+                    <p class="mb-0"><strong>角色:</strong> 
+                        {{ if eq .user_role "admin" }}
+                            <span class="badge bg-danger">管理员</span>
+                        {{ else if eq .user_role "librarian" }}
+                            <span class="badge bg-success">图书管理员</span>
+                        {{ else }}
+                            <span class="badge bg-primary">读者</span>
+                        {{ end }}
+                    </p>
+                </div>
+                <ul class="list-group list-group-flush">
+                    {{ if eq .user_role "admin" }}
+                        <li class="list-group-item"><a href="/admin/books" class="text-decoration-none"><i class="fas fa-book-open"></i> 图书管理</a></li>
+                        <li class="list-group-item"><a href="/admin/users" class="text-decoration-none"><i class="fas fa-users"></i> 用户管理</a></li>
+                    {{ end }}
+                    
+                    {{ if or (eq .user_role "librarian") (eq .user_role "admin") }}
+                        <li class="list-group-item"><a href="/librarian/books" class="text-decoration-none"><i class="fas fa-box"></i> 库存管理</a></li>
+                        <li class="list-group-item"><a href="/librarian/borrow" class="text-decoration-none"><i class="fas fa-exchange-alt"></i> 借阅管理</a></li>
+                    {{ end }}
+                    
+                    <li class="list-group-item"><a href="/reader/books" class="text-decoration-none"><i class="fas fa-search"></i> 查找图书</a></li>
+                    <li class="list-group-item"><a href="/reader/borrowed" class="text-decoration-none"><i class="fas fa-list"></i> 我的借阅</a></li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="col-md-9">
+            <!-- 欢迎消息 -->
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h4>欢迎回来，{{ .username }}！</h4>
+                    <p class="text-muted">当前时间: {{ .now | formatDateTime }}</p>
+                </div>
+            </div>
+            
+            <!-- 管理员仪表板 -->
+            {{ if eq .user_role "admin" }}
+                <div class="row mb-4">
+                    <div class="col-md-4">
+                        <div class="card text-white bg-primary h-100">
+                            <div class="card-body">
+                                <h5 class="card-title"><i class="fas fa-users"></i> 用户数</h5>
+                                <h2 class="display-4">{{ .user_count }}</h2>
+                            </div>
+                            <div class="card-footer d-flex justify-content-between align-items-center">
+                                <span>查看详情</span>
+                                <a href="/admin/users" class="btn btn-sm btn-light"><i class="fas fa-arrow-right"></i></a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card text-white bg-success h-100">
+                            <div class="card-body">
+                                <h5 class="card-title"><i class="fas fa-book"></i> 图书数</h5>
+                                <h2 class="display-4">{{ .book_count }}</h2>
+                            </div>
+                            <div class="card-footer d-flex justify-content-between align-items-center">
+                                <span>查看详情</span>
+                                <a href="/admin/books" class="btn btn-sm btn-light"><i class="fas fa-arrow-right"></i></a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card text-white bg-info h-100">
+                            <div class="card-body">
+                                <h5 class="card-title"><i class="fas fa-exchange-alt"></i> 借阅数</h5>
+                                <h2 class="display-4">{{ .borrow_count }}</h2>
+                            </div>
+                            <div class="card-footer d-flex justify-content-between align-items-center">
+                                <span>查看详情</span>
+                                <a href="/librarian/borrow" class="btn btn-sm btn-light"><i class="fas fa-arrow-right"></i></a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 class="mb-0"><i class="fas fa-cogs"></i> 管理选项</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <a href="/admin/add-book" class="btn btn-success w-100">
+                                    <i class="fas fa-plus"></i> 添加新图书
+                                </a>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <a href="/admin/users" class="btn btn-primary w-100">
+                                    <i class="fas fa-user-edit"></i> 管理用户
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {{ end }}
+            
+            <!-- 图书管理员仪表板 -->
+            {{ if eq .user_role "librarian" }}
+                <div class="row mb-4">
+                    <div class="col-md-4">
+                        <div class="card text-white bg-primary h-100">
+                            <div class="card-body">
+                                <h5 class="card-title"><i class="fas fa-book"></i> 图书总数</h5>
+                                <h2 class="display-4">{{ .book_count }}</h2>
+                            </div>
+                            <div class="card-footer d-flex justify-content-between align-items-center">
+                                <span>查看详情</span>
+                                <a href="/librarian/books" class="btn btn-sm btn-light"><i class="fas fa-arrow-right"></i></a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card text-white bg-success h-100">
+                            <div class="card-body">
+                                <h5 class="card-title"><i class="fas fa-exchange-alt"></i> 当前借阅</h5>
+                                <h2 class="display-4">{{ .active_borrow_count }}</h2>
+                            </div>
+                            <div class="card-footer d-flex justify-content-between align-items-center">
+                                <span>查看详情</span>
+                                <a href="/librarian/borrow" class="btn btn-sm btn-light"><i class="fas fa-arrow-right"></i></a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card text-white bg-danger h-100">
+                            <div class="card-body">
+                                <h5 class="card-title"><i class="fas fa-exclamation-triangle"></i> 逾期</h5>
+                                <h2 class="display-4">{{ .overdue_count }}</h2>
+                            </div>
+                            <div class="card-footer d-flex justify-content-between align-items-center">
+                                <span>查看详情</span>
+                                <a href="/librarian/borrow" class="btn btn-sm btn-light"><i class="fas fa-arrow-right"></i></a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 class="mb-0"><i class="fas fa-clipboard"></i> 图书管理选项</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <a href="/librarian/borrow" class="btn btn-success w-100">
+                                    <i class="fas fa-plus"></i> 创建借阅记录
+                                </a>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <a href="/librarian/books" class="btn btn-primary w-100">
+                                    <i class="fas fa-box"></i> 查看库存
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {{ end }}
+            
+            <!-- 读者仪表板 -->
+            {{ if eq .user_role "reader" }}
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        <div class="card text-white bg-primary h-100">
+                            <div class="card-body">
+                                <h5 class="card-title"><i class="fas fa-book"></i> 已借图书</h5>
+                                <h2 class="display-4">{{ .borrowed_books_count }}</h2>
+                            </div>
+                            <div class="card-footer d-flex justify-content-between align-items-center">
+                                <span>查看详情</span>
+                                <a href="/reader/borrowed" class="btn btn-sm btn-light"><i class="fas fa-arrow-right"></i></a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card text-white bg-danger h-100">
+                            <div class="card-body">
+                                <h5 class="card-title"><i class="fas fa-exclamation-triangle"></i> 逾期图书</h5>
+                                <h2 class="display-4">{{ .overdue_books_count }}</h2>
+                            </div>
+                            <div class="card-footer d-flex justify-content-between align-items-center">
+                                <span>查看详情</span>
+                                <a href="/reader/borrowed" class="btn btn-sm btn-light"><i class="fas fa-arrow-right"></i></a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 class="mb-0"><i class="fas fa-search"></i> 查找图书</h5>
+                    </div>
+                    <div class="card-body">
+                        <form action="/reader/books" method="GET">
+                            <div class="input-group">
+                                <input type="text" class="form-control" name="q" placeholder="输入书名、作者或关键词...">
+                                <button class="btn btn-primary" type="submit">
+                                    <i class="fas fa-search"></i> 搜索
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="card-footer text-center">
+                        <a href="/reader/books" class="btn btn-outline-primary">浏览所有图书</a>
+                    </div>
+                </div>
+            {{ end }}
+            
+            <!-- 快捷链接 -->
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-link"></i> 快捷链接</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <a href="/books" class="btn btn-outline-secondary w-100">
+                                <i class="fas fa-book"></i> 图书列表
+                            </a>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <a href="/reader/borrowed" class="btn btn-outline-primary w-100">
+                                <i class="fas fa-list"></i> 我的借阅
+                            </a>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <a href="/reader/books" class="btn btn-outline-success w-100">
+                                <i class="fas fa-search"></i> 查找图书
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{{ end }}

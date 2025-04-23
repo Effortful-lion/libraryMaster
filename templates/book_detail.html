@@ -1,0 +1,178 @@
+{{ define "content" }}
+<div class="container">
+    <div class="mb-4">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="/">首页</a></li>
+                <li class="breadcrumb-item"><a href="/books">图书列表</a></li>
+                <li class="breadcrumb-item active" aria-current="page">{{ .book.title }}</li>
+            </ol>
+        </nav>
+    </div>
+    
+    <div class="row">
+        <!-- 图书封面和基本信息 -->
+        <div class="col-md-4 mb-4">
+            <div class="card h-100">
+                <img src="{{ .book.cover_url }}" class="card-img-top book-cover" alt="{{ .book.title }}" style="height: 400px; object-fit: contain;">
+                <div class="card-body text-center">
+                    <div class="d-flex justify-content-center mb-3">
+                        <span class="me-2">
+                            <span class="availability-indicator 
+                                {{ if gt .book.quantity 5 }}available
+                                {{ else if gt .book.quantity 0 }}low-stock
+                                {{ else }}unavailable{{ end }}">
+                            </span>
+                            {{ if gt .book.quantity 5 }}
+                                <span class="text-success">有库存</span>
+                            {{ else if gt .book.quantity 0 }}
+                                <span class="text-warning">库存不足</span>
+                            {{ else }}
+                                <span class="text-danger">无库存</span>
+                            {{ end }}
+                        </span>
+                        <span class="text-muted">剩余: {{ .book.quantity }}</span>
+                    </div>
+                    
+                    {{ if .is_authenticated }}
+                        <a href="/reader/borrow/{{ .book.id }}" class="btn btn-primary w-100 {{ if le .book.quantity 0 }}disabled{{ end }}">
+                            <i class="fas fa-hand-holding"></i> 借阅此书
+                        </a>
+                    {{ else }}
+                        <a href="/login" class="btn btn-primary w-100">
+                            <i class="fas fa-sign-in-alt"></i> 登录后借阅
+                        </a>
+                    {{ end }}
+                </div>
+            </div>
+        </div>
+        
+        <!-- 图书详细信息 -->
+        <div class="col-md-8">
+            <div class="card mb-4">
+                <div class="card-header bg-dark text-white">
+                    <h4 class="mb-0">{{ .book.title }}</h4>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-3">
+                        <div class="col-md-3 fw-bold">作者:</div>
+                        <div class="col-md-9">{{ .book.author }}</div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-3 fw-bold">ISBN:</div>
+                        <div class="col-md-9">{{ .book.isbn }}</div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-3 fw-bold">出版年份:</div>
+                        <div class="col-md-9">{{ .book.published_year }}</div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-3 fw-bold">分类:</div>
+                        <div class="col-md-9">
+                            <span class="category-badge">{{ .book.category }}</span>
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-3 fw-bold">状态:</div>
+                        <div class="col-md-9">
+                            {{ if gt .book.quantity 0 }}
+                                <span class="badge bg-success">可借阅</span>
+                            {{ else }}
+                                <span class="badge bg-danger">不可借阅</span>
+                            {{ end }}
+                        </div>
+                    </div>
+                    
+                    <hr>
+                    
+                    <div class="row">
+                        <div class="col-12">
+                            <h5>图书简介:</h5>
+                            <p>{{ .book.description }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 借阅历史 (仅对管理员和图书管理员可见) -->
+            {{ if or (eq .user_role "admin") (eq .user_role "librarian") }}
+                <div class="card">
+                    <div class="card-header bg-dark text-white">
+                        <h5 class="mb-0">借阅历史</h5>
+                    </div>
+                    <div class="card-body">
+                        {{ if .borrow_records }}
+                            <div class="table-responsive">
+                                <table class="table table-striped table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>用户</th>
+                                            <th>借阅日期</th>
+                                            <th>到期日期</th>
+                                            <th>归还日期</th>
+                                            <th>状态</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {{ range .borrow_records }}
+                                            <tr>
+                                                <td>{{ .username }}</td>
+                                                <td>{{ .borrow_date | formatDate }}</td>
+                                                <td>{{ .due_date | formatDate }}</td>
+                                                <td>
+                                                    {{ if .return_date }}
+                                                        {{ .return_date | formatDate }}
+                                                    {{ else }}
+                                                        -
+                                                    {{ end }}
+                                                </td>
+                                                <td>
+                                                    {{ if .return_date }}
+                                                        <span class="badge bg-success">已归还</span>
+                                                    {{ else if .is_overdue }}
+                                                        <span class="badge bg-danger">逾期 {{ .overdue_days }} 天</span>
+                                                    {{ else }}
+                                                        <span class="badge bg-primary">借阅中</span>
+                                                    {{ end }}
+                                                </td>
+                                            </tr>
+                                        {{ end }}
+                                    </tbody>
+                                </table>
+                            </div>
+                        {{ else }}
+                            <p class="text-center py-3 text-muted">暂无借阅记录</p>
+                        {{ end }}
+                    </div>
+                </div>
+            {{ end }}
+        </div>
+    </div>
+    
+    <!-- 推荐图书 -->
+    {{ if .recommended_books }}
+        <div class="mt-5">
+            <h3 class="mb-4">相关推荐</h3>
+            <div class="row">
+                {{ range .recommended_books }}
+                    <div class="col-md-3 mb-4">
+                        <div class="card h-100 card-hover">
+                            <img src="{{ .cover_url }}" class="card-img-top book-cover" alt="{{ .title }}">
+                            <div class="card-body">
+                                <h5 class="card-title">{{ .title }}</h5>
+                                <p class="card-text mb-1">作者：{{ .author }}</p>
+                                <p class="card-text mb-1">
+                                    <span class="category-badge">{{ .category }}</span>
+                                </p>
+                            </div>
+                            <div class="card-footer">
+                                <a href="/books/{{ .id }}" class="btn btn-sm btn-outline-primary w-100">查看详情</a>
+                            </div>
+                        </div>
+                    </div>
+                {{ end }}
+            </div>
+        </div>
+    {{ end }}
+</div>
+{{ end }}

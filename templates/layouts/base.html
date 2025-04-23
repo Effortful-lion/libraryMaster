@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ .title }} - 图书馆管理系统</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.replit.com/agent/bootstrap-agent-dark-theme.min.css" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    
+    <!-- 自定义CSS -->
+    <link rel="stylesheet" href="/static/css/custom.css">
+    
+    {{ template "extra_styles" . }}
+</head>
+<body>
+    <!-- 导航栏 -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+            <a class="navbar-brand" href="/">
+                <i class="fas fa-book"></i> 图书馆管理系统
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/"><i class="fas fa-home"></i> 首页</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/books"><i class="fas fa-book-open"></i> 图书列表</a>
+                    </li>
+                    
+                    {{ if .is_authenticated }}
+                        <li class="nav-item">
+                            <a class="nav-link" href="/dashboard"><i class="fas fa-tachometer-alt"></i> 仪表板</a>
+                        </li>
+                        
+                        {{ if eq .user_role "admin" }}
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" href="#" id="adminDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <i class="fas fa-user-shield"></i> 管理员
+                                </a>
+                                <ul class="dropdown-menu" aria-labelledby="adminDropdown">
+                                    <li><a class="dropdown-item" href="/admin/books"><i class="fas fa-book"></i> 图书管理</a></li>
+                                    <li><a class="dropdown-item" href="/admin/users"><i class="fas fa-users"></i> 用户管理</a></li>
+                                </ul>
+                            </li>
+                        {{ end }}
+                        
+                        {{ if or (eq .user_role "librarian") (eq .user_role "admin") }}
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" href="#" id="librarianDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <i class="fas fa-user-tie"></i> 图书管理员
+                                </a>
+                                <ul class="dropdown-menu" aria-labelledby="librarianDropdown">
+                                    <li><a class="dropdown-item" href="/librarian/books"><i class="fas fa-box"></i> 库存管理</a></li>
+                                    <li><a class="dropdown-item" href="/librarian/borrow"><i class="fas fa-exchange-alt"></i> 借阅管理</a></li>
+                                </ul>
+                            </li>
+                        {{ end }}
+                        
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="readerDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="fas fa-user"></i> 读者
+                            </a>
+                            <ul class="dropdown-menu" aria-labelledby="readerDropdown">
+                                <li><a class="dropdown-item" href="/reader/books"><i class="fas fa-search"></i> 查找图书</a></li>
+                                <li><a class="dropdown-item" href="/reader/borrowed"><i class="fas fa-list"></i> 我的借阅</a></li>
+                            </ul>
+                        </li>
+                    {{ end }}
+                </ul>
+                
+                <div class="navbar-nav">
+                    {{ if .is_authenticated }}
+                        <span class="nav-item nav-link text-white">
+                            <i class="fas fa-user-circle"></i> {{ .username }}
+                            
+                            {{ if eq .user_role "admin" }}
+                                <span class="badge bg-danger">管理员</span>
+                            {{ else if eq .user_role "librarian" }}
+                                <span class="badge bg-success">图书管理员</span>
+                            {{ else }}
+                                <span class="badge bg-primary">读者</span>
+                            {{ end }}
+                        </span>
+                        
+                        <a class="nav-link" href="/logout"><i class="fas fa-sign-out-alt"></i> 退出</a>
+                    {{ else }}
+                        <a class="nav-link" href="/login"><i class="fas fa-sign-in-alt"></i> 登录</a>
+                        <a class="nav-link" href="/register"><i class="fas fa-user-plus"></i> 注册</a>
+                    {{ end }}
+                </div>
+            </div>
+        </div>
+    </nav>
+    
+    <!-- 闪存消息 -->
+    {{ if .flash_message }}
+        <div class="container mt-3">
+            <div class="alert alert-{{ .flash_type }} alert-dismissible fade show" role="alert">
+                {{ .flash_message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        </div>
+    {{ end }}
+    
+    <!-- 主内容 -->
+    <main class="py-4">
+        {{ template "content" . }}
+    </main>
+    
+    <!-- 页脚 -->
+    <footer class="bg-dark text-white mt-5 py-3">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6">
+                    <h5><i class="fas fa-book"></i> 图书馆管理系统</h5>
+                    <p>一个高效、简单的图书馆管理解决方案。</p>
+                </div>
+                <div class="col-md-3">
+                    <h5>快速链接</h5>
+                    <ul class="list-unstyled">
+                        <li><a href="/" class="text-decoration-none text-white"><i class="fas fa-home"></i> 首页</a></li>
+                        <li><a href="/books" class="text-decoration-none text-white"><i class="fas fa-book-open"></i> 图书列表</a></li>
+                        <li><a href="/dashboard" class="text-decoration-none text-white"><i class="fas fa-tachometer-alt"></i> 仪表板</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-3">
+                    <h5>联系我们</h5>
+                    <ul class="list-unstyled">
+                        <li><i class="fas fa-envelope"></i> email@example.com</li>
+                        <li><i class="fas fa-phone"></i> +123-456-7890</li>
+                    </ul>
+                </div>
+            </div>
+            <hr>
+            <div class="text-center">
+                <p class="mb-0">&copy; 2025 图书馆管理系统. 版权所有.</p>
+            </div>
+        </div>
+    </footer>
+    
+    <!-- Bootstrap Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- 主要 JavaScript -->
+    <script src="/static/js/main.js"></script>
+    
+    <!-- 角色特定 JavaScript -->
+    {{ if .is_authenticated }}
+        {{ if eq .user_role "admin" }}
+            <script src="/static/js/admin.js"></script>
+        {{ end }}
+        
+        {{ if or (eq .user_role "librarian") (eq .user_role "admin") }}
+            <script src="/static/js/librarian.js"></script>
+        {{ end }}
+        
+        <script src="/static/js/reader.js"></script>
+    {{ end }}
+    
+    {{ template "extra_scripts" . }}
+</body>
+</html>
+
+{{ define "extra_styles" }}{{ end }}
+{{ define "extra_scripts" }}{{ end }}
