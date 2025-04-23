@@ -76,6 +76,11 @@ func sessionCleanupTask() {
 
         for range ticker.C {
                 log.Println("清理过期会话...")
-                utils.CleanupExpiredSessions()
+                sessionStore := &utils.MemorySessionStore{
+                        sessions: make(map[string]*utils.SessionItem),
+                }
+                if err := sessionStore.ClearExpired(); err != nil {
+                        log.Printf("清理过期会话时出错: %v\n", err)
+                }
         }
 }

@@ -262,3 +262,15 @@ func generateSessionID() string {
 	rand.Read(b)
 	return base64.StdEncoding.EncodeToString(b)
 }
+// CleanupExpiredSessions 清理过期的会话
+func CleanupExpiredSessions() {
+	// 获取默认存储实例
+	store := &MemorySessionStore{
+		sessions: make(map[string]*sessionItem),
+	}
+	
+	// 调用清理方法
+	if err := store.ClearExpired(); err != nil {
+		log.Printf("清理过期会话时出错: %v\n", err)
+	}
+}
